@@ -1,4 +1,4 @@
 angular.module("WidgetApp", [])
-	.controller("HomeCtrl", functon($scope) {
+	.controller("HomeCtrl", function($scope) {
 		$scope.message = "Widgets Application";
 	});
