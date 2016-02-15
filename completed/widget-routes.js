@@ -6,8 +6,12 @@ module.exports = function(app) {
 
 	let lastWidgetId = widgets[widgets.length-1].id;
 
-	function getWidgetIndex(widgetId) {
-		return widgets.indexOf(widgets.filter((widget) => widget.id === req.params.widgetId)[0]);
+	function getWidget(widgetId) {
+		return widgets.filter((widget) => widget.id === widgetId)[0];
+	}
+
+	function getWidgetIndex(widget) {
+		return widgets.indexOf(widget);
 	}
 
 	app.get("/api/widgets", function(req, res) {
@@ -33,9 +37,7 @@ module.exports = function(app) {
 
 	app.get("/api/widgets/:widgetId", function(req, res) {
 		try {
-			res.json(widgets.filter(function(widget) {
-				return widget.id === parseInt(req.params.widgetId, 10);
-			})[0]);
+			res.json(getWidget(parseInt(req.params.widgetId, 10)));
 		} catch(err) {
 			res.error(err.message);
 		}
@@ -43,7 +45,12 @@ module.exports = function(app) {
 
 	app.put("/api/widgets/:widgetId", function(req, res) {
 		try {
-			widgets.splice(getWidgetIndex(parseInt(req.params.widgetId, 10)), 1, req.body);
+			let
+				widgetId = parseInt(req.params.widgetId, 10),
+				widget = getWidget(widgetId);
+			req.body.id = widgetId;
+			widgets.splice(getWidgetIndex(widget), 1, req.body);
+			res.json(widget);
 		} catch(err) {
 			res.error(err.message);
 		}
@@ -51,7 +58,9 @@ module.exports = function(app) {
 
 	app.delete("/api/widgets/:widgetId", function(req, res) {
 		try {
-			widgets.splice(getWidgetIndex(parseInt(req.params.widgetId, 10)), 1);
+			let widget = getWidget(parseInt(req.params.widgetId, 10));
+			widgets.splice(getWidgetIndex(widget), 1);
+			res.json(widget);
 		} catch(err) {
 			res.error(err.message);
 		}
