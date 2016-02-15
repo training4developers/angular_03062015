@@ -19,6 +19,6 @@ http.createServer(app).listen(options.webServer.port, function(err) {
 		return;
 	}
 
-	console.log("web server started on port " + options.webServer.port);
+	console.log(`web server started on port ${options.webServer.port}`);
 
 });

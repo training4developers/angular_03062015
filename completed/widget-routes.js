@@ -34,7 +34,7 @@ module.exports = function(app) {
 	app.get("/api/widgets/:widgetId", function(req, res) {
 		try {
 			res.json(widgets.filter(function(widget) {
-				return widget.id === req.params.widgetId;
+				return widget.id === parseInt(req.params.widgetId, 10);
 			})[0]);
 		} catch(err) {
 			res.error(err.message);
@@ -43,7 +43,7 @@ module.exports = function(app) {
 
 	app.put("/api/widgets/:widgetId", function(req, res) {
 		try {
-			widgets.splice(getWidgetIndex(req.params.widgetId), 1, req.body);
+			widgets.splice(getWidgetIndex(parseInt(req.params.widgetId, 10)), 1, req.body);
 		} catch(err) {
 			res.error(err.message);
 		}
@@ -51,7 +51,7 @@ module.exports = function(app) {
 
 	app.delete("/api/widgets/:widgetId", function(req, res) {
 		try {
-			widgets.splice(getWidgetIndex(req.params.widgetId), 1);
+			widgets.splice(getWidgetIndex(parseInt(req.params.widgetId, 10)), 1);
 		} catch(err) {
 			res.error(err.message);
 		}

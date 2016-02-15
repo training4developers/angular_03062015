@@ -55,19 +55,35 @@ module.exports = function(options) {
 					let req = {
 						method: httpRequest.method,
 						contentType: httpRequest.headers["content-type"],
-						url: url.parse(httpRequest.url, true)
+						url: url.parse(httpRequest.url, true),
+						params: {}
 					};
+
 					req.query = req.url.query;
 					req.path = req.url.pathname;
+					req.pathParts = req.path.slice(1).split("/")
 
-					req.routes = this._routes.filter(function(route) {
-						return (req.method === route.httpMethod) && (req.path.startsWith(route.urlPath));
-					}).map(function(route) {
-						return {
-							params: {},
-							handler: route.handler
-						};
-					});
+					req.routes = this._routes.filter((route) => {
+
+						if ((req.method !== route.httpMethod) || (route.pathParts.length !== req.pathParts.length)) {
+							return false;
+						}
+
+						for (let i=0; i<route.pathParts.length; i++) {
+
+							if (route.pathParts[i].startsWith(":")) {
+								req.params[route.pathParts[i].slice(1)] = req.pathParts[i];
+							} else {
+								if (route.pathParts[i].toUpperCase() !== req.pathParts[i].toUpperCase()) {
+									return false;
+								}
+							}
+
+						}
+
+						return true;
+
+					}).map((route) => route.handler);
 
 					if (req.routes.length === 0) {
 						if (req.isResource = this._isResource(req.path)) {
@@ -85,16 +101,14 @@ module.exports = function(options) {
 
 					let requestBodyBuffers = [];
 
-			    httpRequest.on('data', function(chunk) {
-						requestBodyBuffers.push(new Buffer(chunk));
-			    });
+			    httpRequest.on('data', (chunk) => requestBodyBuffers.push(new Buffer(chunk)));
 
-					httpRequest.on('error', function(err) {
+					httpRequest.on('error', (err) => {
 						req.err = err;
 						reject(req);
 			    });
 
-			    httpRequest.on('end', function() {
+			    httpRequest.on('end', () => {
 
 						try {
 
@@ -114,6 +128,7 @@ module.exports = function(options) {
 			    });
 
 				} catch(err) {
+					console.dir(err);
 					req.err = err;
 					reject(req);
 				}
@@ -144,8 +159,7 @@ module.exports = function(options) {
 			httpRequestPromise.then(function(httpRequest) {
 
 				if (httpRequest.routes.length > 0) {
-					httpRequest.params = httpRequest.routes[0].params;
-					httpRequest.routes[0].handler(httpRequest, httpResponse);
+					httpRequest.routes[0](httpRequest, httpResponse);
 				} else {
 					this._staticFile(httpRequest, httpResponse);
 				}
@@ -156,10 +170,11 @@ module.exports = function(options) {
 			});
 		}
 
-		registerRoute(httpMethod, urlPath, handler) {
+		registerRoute(httpMethod, path, handler) {
 			this._routes.push({
 				httpMethod: httpMethod,
-				urlPath: urlPath,
+				path: path,
+				pathParts: path.slice(1).split("/"),
 				handler: handler
 			});
 		}
