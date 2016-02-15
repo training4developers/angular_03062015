@@ -5,6 +5,7 @@ module.exports = function(options) {
 	const
 		DEFAULT_ENCODING = "UTF-8",
 		CONTENT_TYPES = {
+			".txt": "text/plain",
 			".css": "text/css",
 			".js": "text/javascript",
 			".html": "text/html",
@@ -15,7 +16,11 @@ module.exports = function(options) {
 			".woff2": "application/font-woff2",
 			".json": "application/json"
 		},
-		RESOURCE_PATHS = ["/css", "/js", "/tpls", "/fonts"];
+		RESOURCE_PATHS = ["/css", "/js", "/tpls", "/fonts"],
+		HTTP_METHOD_GET = "GET",
+		HTTP_METHOD_POST = "POST",
+		HTTP_METHOD_PUT = "PUT",
+		HTTP_METHOD_DELETE = "DELETE";
 
 	const
 		path = require("path"),
@@ -43,45 +48,78 @@ module.exports = function(options) {
 
 		_processRequest(httpRequest) {
 
-			let req = {
-				method: httpRequest.method,
-				url: url.parse(httpRequest.url, true)
-			};
-			req.query = req.url.query;
-			req.path = req.url.pathname;
+			return new Promise((resolve, reject) => {
 
-			req.routes = this._routes.filter(function(route) {
-				return (req.method === route.httpMethod) && (req.path.startsWith(route.urlPath));
-			}).map(function(route) {
-				return {
-					params: {},
-					handler: route.handler
-				};
+				try {
+
+					let req = {
+						method: httpRequest.method,
+						contentType: httpRequest.headers["content-type"],
+						url: url.parse(httpRequest.url, true)
+					};
+					req.query = req.url.query;
+					req.path = req.url.pathname;
+
+					req.routes = this._routes.filter(function(route) {
+						return (req.method === route.httpMethod) && (req.path.startsWith(route.urlPath));
+					}).map(function(route) {
+						return {
+							params: {},
+							handler: route.handler
+						};
+					});
+
+					if (req.routes.length === 0) {
+						if (req.isResource = this._isResource(req.path)) {
+							req.fileName = path.join(options.folder, req.path === "/" ?
+								options.defaultFileName : req.path.slice(1));
+						} else {
+							req.fileName = path.join(options.folder, options.defaultFileName);
+						}
+					}
+
+				  if ([HTTP_METHOD_POST,HTTP_METHOD_PUT].indexOf(req.method) === -1) {
+						resolve(req);
+						return;
+					}
+
+					let requestBodyBuffers = [];
+
+			    httpRequest.on('data', function(chunk) {
+						requestBodyBuffers.push(new Buffer(chunk));
+			    });
+
+					httpRequest.on('error', function(err) {
+						req.err = err;
+						reject(req);
+			    });
+
+			    httpRequest.on('end', function() {
+
+						try {
+
+							req.rawBody = Buffer.concat(requestBodyBuffers);
+
+							if (req.contentType === CONTENT_TYPES[".json"]) {
+								req.body = JSON.parse(req.rawBody.toString());
+							}
+
+							resolve(req);
+
+						} catch(err) {
+							req.err = err;
+							reject(req);
+						}
+
+			    });
+
+				} catch(err) {
+					req.err = err;
+					reject(req);
+				}
+
 			});
 
-			if (req.routes.length === 0) {
-				if (req.isResource = this._isResource(req.path)) {
-					req.fileName = path.join(options.folder, req.path === "/" ?
-						options.defaultFileName : req.path.slice(1));
-				} else {
-					req.fileName = path.join(options.folder, options.defaultFileName);
-				}
-			}
-
-
-		  if (req.method == 'POST') {
-		    console.log("[200] " + req.method + " to " + req.path);
-
-		    httpRequest.on('data', function(chunk) {
-		      console.log("Received body data:");
-		      console.log(chunk.toString());
-		    });
-
-		    httpRequest.on('end', function() {
-		    });
-			}
-
-			return req;
 		}
 
 		_staticFile(httpRequest, httpResponse) {
@@ -91,20 +129,31 @@ module.exports = function(options) {
 			});
 		}
 
-		_sendResponse(httpRequest, httpResponse) {
+		_sendResponse(httpRequestPromise, httpResponse) {
 
 			httpResponse.json = function(obj) {
 				this.setHeader("Content-Type", CONTENT_TYPES[".json"]);
 				this.end(JSON.stringify(obj), DEFAULT_ENCODING);
 			};
 
-			if (httpRequest.routes.length > 0) {
-				httpRequest.params = httpRequest.routes[0].params;
-				httpRequest.routes[0].handler(httpRequest, httpResponse);
-			} else {
-				this._staticFile(httpRequest, httpResponse);
-			}
+			httpResponse.error = function(statusMessage, statusCode) {
+				this.writeHead(statusCode || 500, statusMessage);
+				this.end();
+			};
 
+			httpRequestPromise.then(function(httpRequest) {
+
+				if (httpRequest.routes.length > 0) {
+					httpRequest.params = httpRequest.routes[0].params;
+					httpRequest.routes[0].handler(httpRequest, httpResponse);
+				} else {
+					this._staticFile(httpRequest, httpResponse);
+				}
+
+			}).catch(function(httpRequest) {
+				httpResponse.writeHead(500, "Internal Server Error");
+				httpResponse.end();
+			});
 		}
 
 		registerRoute(httpMethod, urlPath, handler) {
