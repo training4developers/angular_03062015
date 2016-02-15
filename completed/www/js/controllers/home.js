@@ -16,11 +16,10 @@
 
 		$scope.viewWidget = function(widgetId) {
 			$state.go("view", { widgetId: widgetId });
-
 		}
 
 		$scope.createWidget = function() {
-			$state.go("edit", { widgetId: null });
+			$state.go("create");
 		}
 
 	}

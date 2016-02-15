@@ -6,27 +6,31 @@
 
 	function router($stateProvider, $urlRouterProvider, $locationProvider) {
 
+		$urlRouterProvider.otherwise("/");
+		$locationProvider.html5Mode(true);
+
 		$stateProvider
 			.state("home", {
-				url: "",
+				url: "/",
 				controller: "homeCtrl",
 				templateUrl: "tpls/home.html"
 			})
+			.state("create", {
+				url: "/widgets/create",
+				controller: "widgetEditCtrl",
+				templateUrl: "tpls/widget-edit.html"
+			})
 			.state("view", {
-				url: "widgets/:widgetId",
+				url: "/widgets/:widgetId",
 				controller: "widgetViewCtrl",
 				templateUrl: "tpls/widget-view.html"
 			})
 			.state("edit", {
-				url: "widgets/:widgetId/edit",
-				controller: "widgetEditCtrl",
-				templateUrl: "tpls/widget-edit.html"
-			})
-			.state("create", {
-				url: "widgets/create",
+				url: "/widgets/:widgetId/edit",
 				controller: "widgetEditCtrl",
 				templateUrl: "tpls/widget-edit.html"
 			});
+
 	}
 
 	angular.module("WidgetApp").config(router)

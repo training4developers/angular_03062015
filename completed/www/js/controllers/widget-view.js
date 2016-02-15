@@ -6,15 +6,15 @@
 
 	function controller($scope, widgets, $state) {
 
-		widgets.get($state.params.id).then(function(results) {
+		widgets.get($state.params.widgetId).then(function(results) {
 			$scope.widget = results.data;
 		});
 
-		$scope.editWidget(widgetId) {
+		$scope.editWidget = function(widgetId) {
 			$state.go("edit", { widgetId: widgetId });
 		};
 
-		$scope.returnToList() {
+		$scope.returnToList = function() {
 			$state.go("home");
 		};
 	}

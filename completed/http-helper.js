@@ -55,12 +55,18 @@ module.exports = function(options) {
 
 				try {
 
-					let req = {
-						method: httpRequest.method,
-						contentType: httpRequest.headers[HTTP_HEADER_CONTENT_TYPE],
-						url: url.parse(httpRequest.url, true),
-						params: {}
-					};
+					let
+						req = {
+							method: httpRequest.method,
+							url: url.parse(httpRequest.url, true),
+							params: {}
+						};
+
+					if (httpRequest.headers[HTTP_HEADER_CONTENT_TYPE]) {
+						let contentTypeTokens = httpRequest.headers[HTTP_HEADER_CONTENT_TYPE].split(";");
+						req.contentType = contentTypeTokens[0];
+						req.charSet = contentTypeTokens[1];
+					}
 
 					req.query = req.url.query;
 					req.path = req.url.pathname;
@@ -133,7 +139,6 @@ module.exports = function(options) {
 			    });
 
 				} catch(err) {
-					console.log(err.message);
 					req.err = err;
 					reject(req);
 				}

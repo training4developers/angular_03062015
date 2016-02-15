@@ -2,6 +2,6 @@
 	"webServer": {
 		"port": 8080,
 		"folder": "www",
-		"html5Mode": false
+		"html5Mode": true
 	}
 }
