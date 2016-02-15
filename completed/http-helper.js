@@ -172,11 +172,12 @@ module.exports = function(options) {
 			});
 		}
 
-		registerRoute(httpMethod, path, handler) {
+		registerRoute(httpMethod, pathPrefix, path, handler) {
+			let fullPath = pathPrefix + path;
 			this._routes.push({
 				httpMethod: httpMethod,
-				path: path,
-				pathParts: path.slice(1).split("/"),
+				path: fullPath,
+				pathParts: fullPath.slice(1).split("/"),
 				handler: handler
 			});
 		}
@@ -194,10 +195,19 @@ module.exports = function(options) {
 		httpHelper.receiveRequest(httpRequest).sendResponse(httpResponse);
 	}
 
-	requestListener.get = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_GET);
-	requestListener.post = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_POST);
-	requestListener.put = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_PUT);
-	requestListener.delete = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_DELETE);
+	requestListener.use = function(routePrefix, routesRegistrationFn) {
+		routesRegistrationFn({
+			get: httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_GET, routePrefix),
+			post: httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_POST, routePrefix),
+			put: httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_PUT, routePrefix),
+			delete: httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_DELETE, routePrefix)
+		});
+	}.bind(httpHelper);
+
+	requestListener.get = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_GET, "");
+	requestListener.post = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_POST, "");
+	requestListener.put = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_PUT, "");
+	requestListener.delete = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_DELETE, "");
 
 	return requestListener;
 };

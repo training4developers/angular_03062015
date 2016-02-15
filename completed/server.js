@@ -1,21 +1,17 @@
 "use strict";
 
 const
-	path = require("path"),
-	fs = require("fs"),
-	url = require("url"),
 	http = require("http"),
-	options = JSON.parse(fs.readFileSync("config.json")),
-	app = require("./widget-routes")(require("./http-helper")(options.webServer));
+	httpHelper = require("./http-helper"),
+	options = JSON.parse(require("fs").readFileSync("config.json")),
+	app = httpHelper(options.webServer);
 
-process.on("uncaughtException", function(err) {
-	console.log(`Caught exception: ${err}`);
-});
+app.use("/api", require("./widget-routes"));
 
 http.createServer(app).listen(options.webServer.port, function(err) {
 
 	if (err) {
-		console.dir(err);
+		console.log(err.message);
 		return;
 	}
 

@@ -14,7 +14,7 @@ module.exports = function(app) {
 		return widgets.indexOf(widget);
 	}
 
-	app.get("/api/widgets", function(req, res) {
+	app.get("/widgets", function(req, res) {
 		try {
 			res.json(widgets);
 		} catch(err) {
@@ -22,7 +22,7 @@ module.exports = function(app) {
 		}
 	});
 
-	app.post("/api/widgets", function(req, res) {
+	app.post("/widgets", function(req, res) {
 		try {
 			let widget = req.body;
 			widget.id = ++lastWidgetId;
@@ -35,7 +35,7 @@ module.exports = function(app) {
 		}
 	});
 
-	app.get("/api/widgets/:widgetId", function(req, res) {
+	app.get("/widgets/:widgetId", function(req, res) {
 		try {
 			res.json(getWidget(parseInt(req.params.widgetId, 10)));
 		} catch(err) {
@@ -43,7 +43,7 @@ module.exports = function(app) {
 		}
 	});
 
-	app.put("/api/widgets/:widgetId", function(req, res) {
+	app.put("/widgets/:widgetId", function(req, res) {
 		try {
 			let
 				widgetId = parseInt(req.params.widgetId, 10),
@@ -56,7 +56,7 @@ module.exports = function(app) {
 		}
 	});
 
-	app.delete("/api/widgets/:widgetId", function(req, res) {
+	app.delete("/widgets/:widgetId", function(req, res) {
 		try {
 			let widget = getWidget(parseInt(req.params.widgetId, 10));
 			widgets.splice(getWidgetIndex(widget), 1);
