@@ -3,6 +3,7 @@ module.exports = function(options) {
 	"use strict";
 
 	const
+		DEFAULT_FILE = "index.html",
 		DEFAULT_ENCODING = "UTF-8",
 		CONTENT_TYPES = {
 			".txt": "text/plain",
@@ -20,16 +21,15 @@ module.exports = function(options) {
 		HTTP_METHOD_GET = "GET",
 		HTTP_METHOD_POST = "POST",
 		HTTP_METHOD_PUT = "PUT",
-		HTTP_METHOD_DELETE = "DELETE";
+		HTTP_METHOD_DELETE = "DELETE",
+		HTTP_HEADER_CONTENT_TYPE = "content-type";
 
 	const
 		path = require("path"),
 		fs = require("fs"),
 		url = require("url");
 
-	options = Object.assign({
-		defaultFileName: "index.html"
-	}, options);
+	options = Object.assign({ defaultFileName: DEFAULT_FILE }, options);
 
 	class HttpHelper {
 
@@ -54,7 +54,7 @@ module.exports = function(options) {
 
 					let req = {
 						method: httpRequest.method,
-						contentType: httpRequest.headers["content-type"],
+						contentType: httpRequest.headers[HTTP_HEADER_CONTENT_TYPE],
 						url: url.parse(httpRequest.url, true),
 						params: {}
 					};
@@ -87,10 +87,13 @@ module.exports = function(options) {
 
 					if (req.routes.length === 0) {
 						if (req.isResource = this._isResource(req.path)) {
-							req.fileName = path.join(options.folder, req.path === "/" ?
-								options.defaultFileName : req.path.slice(1));
+							req.fileName = path.join(options.folder, req.path.slice(1));
 						} else {
-							req.fileName = path.join(options.folder, options.defaultFileName);
+							if (options.html5Mode) {
+								req.fileName = path.join(options.folder, options.defaultFileName);
+							} else {
+								req.fileName = path.join(options.folder, req.path === "/" ? options.defaultFileName : req.path.slice(1));
+							}
 						}
 					}
 
@@ -128,7 +131,6 @@ module.exports = function(options) {
 			    });
 
 				} catch(err) {
-					console.dir(err);
 					req.err = err;
 					reject(req);
 				}
@@ -138,7 +140,7 @@ module.exports = function(options) {
 		}
 
 		_staticFile(httpRequest, httpResponse) {
-			httpResponse.setHeader("Content-Type", CONTENT_TYPES[path.extname(httpRequest.fileName)] || "text/plain");
+			httpResponse.setHeader(HTTP_HEADER_CONTENT_TYPE, CONTENT_TYPES[path.extname(httpRequest.fileName)] || CONTENT_TYPES[".txt"]);
 			fs.readFile(httpRequest.fileName, DEFAULT_ENCODING, (err, data) => {
 				httpResponse.end(data, DEFAULT_ENCODING);
 			});
@@ -147,7 +149,7 @@ module.exports = function(options) {
 		_sendResponse(httpRequestPromise, httpResponse) {
 
 			httpResponse.json = function(obj) {
-				this.setHeader("Content-Type", CONTENT_TYPES[".json"]);
+				this.setHeader(HTTP_HEADER_CONTENT_TYPE, CONTENT_TYPES[".json"]);
 				this.end(JSON.stringify(obj), DEFAULT_ENCODING);
 			};
 
@@ -156,7 +158,7 @@ module.exports = function(options) {
 				this.end();
 			};
 
-			httpRequestPromise.then(function(httpRequest) {
+			httpRequestPromise.then((httpRequest) => {
 
 				if (httpRequest.routes.length > 0) {
 					httpRequest.routes[0](httpRequest, httpResponse);
@@ -164,7 +166,7 @@ module.exports = function(options) {
 					this._staticFile(httpRequest, httpResponse);
 				}
 
-			}).catch(function(httpRequest) {
+			}).catch(function(err) {
 				httpResponse.writeHead(500, "Internal Server Error");
 				httpResponse.end();
 			});
@@ -192,10 +194,10 @@ module.exports = function(options) {
 		httpHelper.receiveRequest(httpRequest).sendResponse(httpResponse);
 	}
 
-	requestListener.get = httpHelper.registerRoute.bind(httpHelper, "GET");
-	requestListener.post = httpHelper.registerRoute.bind(httpHelper, "POST");
-	requestListener.put = httpHelper.registerRoute.bind(httpHelper, "PUT");
-	requestListener.delete = httpHelper.registerRoute.bind(httpHelper, "DELETE");
+	requestListener.get = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_GET);
+	requestListener.post = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_POST);
+	requestListener.put = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_PUT);
+	requestListener.delete = httpHelper.registerRoute.bind(httpHelper, HTTP_METHOD_DELETE);
 
 	return requestListener;
 };
