@@ -15,9 +15,12 @@ module.exports = function(options) {
 			".ttf": "application/font-sfnt",
 			".woff": "application/font-woff",
 			".woff2": "application/font-woff2",
-			".json": "application/json"
+			".json": "application/json",
+			".png": "image/png",
+			".gif": "image/gif",
+			".jpg": "image/jpeg"
 		},
-		RESOURCE_PATHS = ["/css", "/js", "/tpls", "/fonts"],
+		RESOURCE_PATHS = ["/css", "/js", "/tpls", "/fonts", "/tests"],
 		HTTP_METHOD_GET = "GET",
 		HTTP_METHOD_POST = "POST",
 		HTTP_METHOD_PUT = "PUT",
@@ -86,14 +89,13 @@ module.exports = function(options) {
 					}).map((route) => route.handler);
 
 					if (req.routes.length === 0) {
-						if (req.isResource = this._isResource(req.path)) {
-							req.fileName = path.join(options.folder, req.path.slice(1));
+						if (req.isResource = this._isResource(req.path) || !options.html5Mode) {
+							req.fileName = path.join(
+								options.folder,
+								req.pathParts.slice(0, req.pathParts.length-1).join(path.sep),
+								req.path.endsWith("/") ? options.defaultFileName : req.pathParts[req.pathParts.length-1]);
 						} else {
-							if (options.html5Mode) {
-								req.fileName = path.join(options.folder, options.defaultFileName);
-							} else {
-								req.fileName = path.join(options.folder, req.path === "/" ? options.defaultFileName : req.path.slice(1));
-							}
+							req.fileName = path.join(options.folder, options.defaultFileName);
 						}
 					}
 
@@ -131,6 +133,7 @@ module.exports = function(options) {
 			    });
 
 				} catch(err) {
+					console.log(err.message);
 					req.err = err;
 					reject(req);
 				}
@@ -141,8 +144,14 @@ module.exports = function(options) {
 
 		_staticFile(httpRequest, httpResponse) {
 			httpResponse.setHeader(HTTP_HEADER_CONTENT_TYPE, CONTENT_TYPES[path.extname(httpRequest.fileName)] || CONTENT_TYPES[".txt"]);
-			fs.readFile(httpRequest.fileName, DEFAULT_ENCODING, (err, data) => {
-				httpResponse.end(data, DEFAULT_ENCODING);
+			fs.readFile(httpRequest.fileName, (err, data) => {
+
+				if (err) {
+					httpResponse.error(err.message);
+					return;
+				}
+
+				httpResponse.end(data);
 			});
 		}
 
