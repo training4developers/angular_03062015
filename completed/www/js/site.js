@@ -2,9 +2,10 @@
 
 	"use strict";
 
-	angular.module("WidgetApp", [])
-		.controller("HomeCtrl", function($scope) {
-			$scope.message = "Widgets Application";
-		});
+	document.addEventListener("DOMContentLoaded", function() {
+
+		angular.bootstrap(document.querySelector("main"), ["WidgetApp"]);
+
+	});
 
 })(angular);

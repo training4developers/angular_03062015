@@ -6,7 +6,7 @@ const
 	options = JSON.parse(require("fs").readFileSync("config.json")),
 	app = httpHelper(options.webServer);
 
-app.use("/api", require("./widget-routes"));
+app.use("/api", require("./widget-api-routes"));
 
 http.createServer(app).listen(options.webServer.port, function(err) {
 
