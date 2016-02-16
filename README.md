@@ -10,7 +10,7 @@ To get started, download and extract the zip file or clone the repository to a l
 
 Only [Node.js](https://nodejs.org) needs to be installed to run this code. Please use the LTS version of Node.js. No NPM packages need to be installed.
 
-To run either the **start** or **completed** version of the application, change to the appropriate folder, and run the following command from the terminal.
+To run either the **start** or **completed** version of the application, change to the "start" or "completed" folder, and run the following command from the terminal.
 
 ```bash
 $ node server
