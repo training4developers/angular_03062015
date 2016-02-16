@@ -1,4 +1,4 @@
-describe("home controller", function() {
+describe("widget view controller", function() {
 
 	var mockScope;
 
@@ -8,17 +8,16 @@ describe("home controller", function() {
 
 		mockScope = $rootScope.$new();
 
-		$controller("HomeCtrl", {
+		$controller("widgetViewCtrl", {
 			$scope: mockScope
 		});
 
 	}));
 
-	it("set message", function() {
+	it("demo test", function() {
 
-		expect(mockScope.message).toBe("Widgets Application");
+		expect(true).toBe(true);
 
 	});
 
-
-})
+});
