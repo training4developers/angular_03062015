@@ -22,6 +22,6 @@ To run the unit tests, open a web browser and navigate to [http://localhost:8080
 
 ## Configuration
 
-The **config.json** file can be modified to change the web server port in case port 8080 is already being used by another application on your system.
+The **config.json** file can be modified to change the web server port. This is useful if port 8080 is already being used by another application on your system.
 
 Also, **html5Mode** can be set to true when using HTML5 mode for client side routing in Angular.js. When set to true, the **index.html** will always be served up, regardless of the url, except for CSS, JavaScript, font, template, and test files.
