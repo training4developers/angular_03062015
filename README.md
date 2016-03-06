@@ -1,5 +1,8 @@
 # Welcome to Introduction to Angular.js!
 
+# Instructor
+Eric Greene [linkedin.com/in/ericwgreene](linkedin.com/in/ericwgreene)
+
 ## Public Wifi
 - SSID: Esri Public
 - Password: esripub
