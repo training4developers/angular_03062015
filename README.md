@@ -1,5 +1,9 @@
 # Welcome to Introduction to Angular.js!
 
+## Public Wifi
+SSID: Esri Public
+Password: esripub
+
 ## Overview
 
 This repository contains a **start** and **completed** folder. The **start** folder is the starting place for the class, while the **completed** folder is a completed application with unit tests.
