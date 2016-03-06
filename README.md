@@ -1,8 +1,8 @@
 # Welcome to Introduction to Angular.js!
 
 ## Public Wifi
-SSID: Esri Public
-Password: esripub
+- SSID: Esri Public
+- Password: esripub
 
 ## Overview
 
