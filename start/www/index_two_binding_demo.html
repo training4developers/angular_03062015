@@ -15,16 +15,8 @@
 
 		<main ng-app="WidgetApp" class="container">
 			<div ng-controller="HomeCtrl">
-
-				Show Me: <input ng-model="missouri" type="checkbox">
-
-				<div ng-if="missouri">
-					<div ng-controller="CoolCtrl">
-						Missouri is the Show Me state!<br>
-						{{message}}
-					</div>
-				</div>
-
+				{{message}}<br>
+				<input ng-model="message">
 			</div>
 		</main>
 

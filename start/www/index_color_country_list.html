@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		<title>Angular.js Demo App</title>
+		<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/bootstrap-theme.min.css" rel="stylesheet">
+		<link href="css/site.css" rel="stylesheet">
+		<base href="/">
+	</head>
+
+	<body>
+
+		<main ng-app="WidgetApp" class="container">
+			<div ng-controller="HomeCtrl">
+				Color Filter <input type="text" ng-model="colorFilter"><br>
+				Sort Descending <input type="checkbox" ng-model="colorSort">
+				<ul>
+					<li ng-repeat="color in colors | filter:colorFilter | orderBy:'toString()':colorSort">{{$index}} {{$odd}} {{color}}</li>
+				</ul>
+				New Color: <input type="text" ng-model="newColor">
+				<button onclick="addColor()">Add Color</button>
+				<br><br>
+
+				Continent Filter <input type="text" ng-model="continentFilter"><br>
+				<ul>
+					<li ng-repeat="country in countries | filter:{continent:continentFilter} | orderBy:'capital'">
+						{{country.capital}}, {{country.name}} - {{country.continent}}
+					</li>
+				</ul>
+				<form novalidate>
+					<div>
+						<label>
+							Country Name
+							<input type="text" ng-model="country.name">
+						</label>
+					</div>
+					<div>
+						<label>
+							Country Capital
+							<input type="text" ng-model="country.capital">
+						</label>
+					</div>
+					<div>
+						<label>
+							Country Continent
+							<input type="text" ng-model="country.continent">
+						</label>
+					</div>
+					<button ng-click="addCountry()">Add Country</button>
+				</form>
+			</div>
+		</main>
+
+		<script src="js/ng/angular.js"></script>
+		<script src="js/ng/angular-animate.js"></script>
+		<script src="js/ng/angular-sanitize.js"></script>
+		<script src="js/ng/angular-ui-router.js"></script>
+		<script src="js/site.js"></script>
+
+	</body>
+
+</html>

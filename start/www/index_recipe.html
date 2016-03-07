@@ -9,22 +9,36 @@
 		<link href="css/bootstrap-theme.min.css" rel="stylesheet">
 		<link href="css/site.css" rel="stylesheet">
 		<base href="/">
+		<style>
+			main.ng-scope, div.ng-scope {
+				border: 2px solid red;
+				margin:5px;
+				padding:5px;
+			}
+		</style>
 	</head>
 
 	<body>
 
 		<main ng-app="WidgetApp" class="container">
+			{{$id}}
 			<div ng-controller="HomeCtrl">
-
-				Show Me: <input ng-model="missouri" type="checkbox">
-
-				<div ng-if="missouri">
-					<div ng-controller="CoolCtrl">
-						Missouri is the Show Me state!<br>
-						{{message}}
-					</div>
-				</div>
-
+				{{$id}}
+			</div>
+			<div ng-controller="HomeCtrl">
+				{{$id}}
+			</div>
+			<div ng-controller="HomeCtrl">
+				{{$id}}
+			</div>
+			<div ng-controller="HomeCtrl">
+				{{$id}}
+			</div>
+			<div ng-controller="HomeCtrl">
+				{{$id}}
+			</div>
+			<div ng-controller="HomeCtrl">
+				{{$id}}
 			</div>
 		</main>
 
