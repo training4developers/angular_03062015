@@ -15,9 +15,14 @@
 
 		<main ng-app="WidgetApp" class="container">
 			<div ng-controller="HomeCtrl">
-				<div ng-include=" '/tpls/list.tpl' "></div>
-				<div ng-if="showEdit">
-					<div ng-include=" '/tpls/edit.tpl' "></div>
+
+				Show Me: <input ng-model="missouri" type="checkbox">
+
+				<div ng-if="missouri">
+					<div ng-controller="CoolCtrl">
+						Missouri is the Show Me state!<br>
+						{{message}}
+					</div>
 				</div>
 
 			</div>
