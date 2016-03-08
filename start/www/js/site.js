@@ -2,26 +2,56 @@
 
 	"use strict";
 
-	angular.module("WidgetApp", [])
-		.controller("HomeCtrl", function($scope) {
+	angular.module("WidgetApp", ["ui.router"])
+		.config(function($stateProvider, $urlRouterProvider, $locationProvider) {
 
-			$scope.widgets = [
-				{ "id": 1, "name": "Small Red Widget",   "description": "A small, red widget.",   "color": "red",    "size": "small",  "quantity": 2 },
-				{ "id": 2, "name": "Medium Blue Widget", "description": "A medium, blue widget.", "color": "blue",   "size": "medium", "quantity": 15 },
-				{ "id": 3, "name": "Large Green Widget", "description": "A large, green widget.", "color": "green",  "size": "large",  "quantity": 30 },
-				{ "id": 4, "name": "Tiny Orange Widget", "description": "A tiny, orange widget.", "color": "orange", "size": "tiny",   "quantity": 10 }
-			];
+			$urlRouterProvider.otherwise("/");
+			$locationProvider.html5Mode(false);
 
-			$scope.createWidget = function() {
-				$scope.showEdit = true;
+			$stateProvider
+				.state("home", {
+					url: "/",
+					templateUrl: "/tpls/list.tpl",
+					controller: "home"
+					// template: "<h2>{{title}}</h2><a ui-sref='about'>About</a><ul><li ng-repeat='widget in widgets'>{{widget.name}}</li></ul>",
+					// controller: function($scope, widgets) {
+					// 	$scope.title = "Home";
+					//
+					// 	widgets.getAll().then(function(results) {
+					// 		$scope.widgets = results.data;
+					// 	})
+					// }
+				})
+				.state("about", {
+					url: "/about",
+					template: "<h2>{{title}}</h2>",
+					controller: function($scope) {
+						$scope.title = "About";
+					}
+				});
+
+
+		})
+		.factory("widgets", ["$http", function($http) {
+
+			return {
+				getAll: function() {
+					return $http.get("/api/widgets");
+				},
+				get: function(widgetId) {
+					return $http.get("/api/widgets/" + encodeURIComponent(widgetId));
+				},
+				insert: function(widget) {
+					return $http.post("/api/widgets", widget);
+				},
+				update: function(widget) {
+					return $http.put("/api/widgets/" + encodeURIComponent(widget.id), widget);
+				},
+				delete: function(widgetId) {
+					return $http.delete("/api/widgets/" + encodeURIComponent(widgetId));
+				}
 			};
 
-			$scope.saveWidget = function() {
-				$scope.widgets.push(this.widget);
-				this.widget = {};
-				$scope.showEdit = false;
-			};
-
-		});
+		}]);
 
 })(angular);

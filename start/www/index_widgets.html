@@ -13,25 +13,21 @@
 
 	<body>
 
-		<main class="container">
-			<header>
-				<h1>Widget App</h1>
-			</header>
-			<div ui-view></div>
+		<main ng-app="WidgetApp" class="container">
+			<div ng-controller="HomeCtrl">
+				<div ng-include=" '/tpls/list.tpl' "></div>
+				<div ng-if="showEdit">
+					<div ng-include=" '/tpls/edit.tpl' "></div>
+				</div>
+
+			</div>
 		</main>
 
 		<script src="js/ng/angular.js"></script>
 		<script src="js/ng/angular-animate.js"></script>
 		<script src="js/ng/angular-sanitize.js"></script>
 		<script src="js/ng/angular-ui-router.js"></script>
-		<script src="js/init.js"></script>
-		<script src="js/services/widgets.js"></script>
-		<script src="js/routes.js"></script>
-		<script src="js/controllers/home.js"></script>
-		<script src="js/controllers/view.js"></script>
-		<script src="js/controllers/edit.js"></script>
-		<script src="js/start.js"></script>
-
+		<script src="js/site.js"></script>
 
 	</body>
 

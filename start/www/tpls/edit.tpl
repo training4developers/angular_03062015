@@ -1,8 +1,11 @@
-<form novalidate>
-
+<form name="widgetForm" novalidate>
 	<div>
 		<label>
-			Name: <input ng-model="widget.name">
+			Name: <input name="widgetName" ng-model="widget.name" required>
+			<span ng-show="widgetForm.widgetName.$invalid &&
+				widgetForm.widgetName.$touched">
+				Name is required.
+			</span>
 		</label>
 	</div>
 	<div>
@@ -25,7 +28,7 @@
 			Quantity: <input ng-model="widget.quantity">
 		</label>
 	</div>
-
 	<button ng-click="saveWidget()">Save Widget</button>
-
+	<button ng-click="deleteWidget()" ng-if="widget.id">Delete Widget</button>
+	<button ng-click="returnToList()">Return to List</button>
 </form>

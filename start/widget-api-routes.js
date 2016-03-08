@@ -24,12 +24,14 @@ module.exports = function(app) {
 
 	app.post("/widgets", function(req, res) {
 		try {
-			let widget = req.body;
-			widget.id = ++lastWidgetId;
-			widgets.push(widget)
-			res.json({
-				widgetId: widget.id
-			});
+			setTimeout(function() {
+				let widget = req.body;
+				widget.id = ++lastWidgetId;
+				widgets.push(widget)
+				res.json({
+					widgetId: widget.id
+				});
+			}, 1000);
 		} catch(err) {
 			res.error(err.message);
 		}
